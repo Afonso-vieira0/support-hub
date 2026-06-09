@@ -22,7 +22,7 @@ function DashboardPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("tickets")
-        .select("id, device_name, category, status, priority, created_at, resolved_at, client_id, technician_id")
+        .select("id, ticket_number, device_name, category, status, created_at, resolved_at, client_id, technician_id")
         .order("created_at", { ascending: false })
         .limit(50);
       if (error) throw error;
