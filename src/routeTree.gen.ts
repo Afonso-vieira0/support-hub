@@ -20,6 +20,7 @@ import { Route as AuthenticatedTicketsIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedTicketsNewRouteImport } from './routes/_authenticated/tickets.new'
 import { Route as AuthenticatedTicketsIdRouteImport } from './routes/_authenticated/tickets.$id'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
+import { Route as AuthenticatedAdminCompareRouteImport } from './routes/_authenticated/admin.compare'
 import { Route as AuthenticatedAdminActivityRouteImport } from './routes/_authenticated/admin.activity'
 import { Route as AuthenticatedAdminTechniciansIndexRouteImport } from './routes/_authenticated/admin.technicians.index'
 import { Route as AuthenticatedTicketsIdRateRouteImport } from './routes/_authenticated/tickets.$id.rate'
@@ -81,6 +82,12 @@ const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   path: '/admin/users',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminCompareRoute =
+  AuthenticatedAdminCompareRouteImport.update({
+    id: '/admin/compare',
+    path: '/admin/compare',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminActivityRoute =
   AuthenticatedAdminActivityRouteImport.update({
     id: '/admin/activity',
@@ -114,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/stats': typeof AuthenticatedStatsRoute
   '/admin/activity': typeof AuthenticatedAdminActivityRoute
+  '/admin/compare': typeof AuthenticatedAdminCompareRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/tickets/$id': typeof AuthenticatedTicketsIdRouteWithChildren
   '/tickets/new': typeof AuthenticatedTicketsNewRoute
@@ -130,6 +138,7 @@ export interface FileRoutesByTo {
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/stats': typeof AuthenticatedStatsRoute
   '/admin/activity': typeof AuthenticatedAdminActivityRoute
+  '/admin/compare': typeof AuthenticatedAdminCompareRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/tickets/$id': typeof AuthenticatedTicketsIdRouteWithChildren
   '/tickets/new': typeof AuthenticatedTicketsNewRoute
@@ -148,6 +157,7 @@ export interface FileRoutesById {
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/stats': typeof AuthenticatedStatsRoute
   '/_authenticated/admin/activity': typeof AuthenticatedAdminActivityRoute
+  '/_authenticated/admin/compare': typeof AuthenticatedAdminCompareRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/tickets/$id': typeof AuthenticatedTicketsIdRouteWithChildren
   '/_authenticated/tickets/new': typeof AuthenticatedTicketsNewRoute
@@ -166,6 +176,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/stats'
     | '/admin/activity'
+    | '/admin/compare'
     | '/admin/users'
     | '/tickets/$id'
     | '/tickets/new'
@@ -182,6 +193,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/stats'
     | '/admin/activity'
+    | '/admin/compare'
     | '/admin/users'
     | '/tickets/$id'
     | '/tickets/new'
@@ -199,6 +211,7 @@ export interface FileRouteTypes {
     | '/_authenticated/notifications'
     | '/_authenticated/stats'
     | '/_authenticated/admin/activity'
+    | '/_authenticated/admin/compare'
     | '/_authenticated/admin/users'
     | '/_authenticated/tickets/$id'
     | '/_authenticated/tickets/new'
@@ -294,6 +307,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/compare': {
+      id: '/_authenticated/admin/compare'
+      path: '/admin/compare'
+      fullPath: '/admin/compare'
+      preLoaderRoute: typeof AuthenticatedAdminCompareRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/activity': {
       id: '/_authenticated/admin/activity'
       path: '/admin/activity'
@@ -344,6 +364,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedStatsRoute: typeof AuthenticatedStatsRoute
   AuthenticatedAdminActivityRoute: typeof AuthenticatedAdminActivityRoute
+  AuthenticatedAdminCompareRoute: typeof AuthenticatedAdminCompareRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedTicketsIdRoute: typeof AuthenticatedTicketsIdRouteWithChildren
   AuthenticatedTicketsNewRoute: typeof AuthenticatedTicketsNewRoute
@@ -357,6 +378,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedStatsRoute: AuthenticatedStatsRoute,
   AuthenticatedAdminActivityRoute: AuthenticatedAdminActivityRoute,
+  AuthenticatedAdminCompareRoute: AuthenticatedAdminCompareRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedTicketsIdRoute: AuthenticatedTicketsIdRouteWithChildren,
   AuthenticatedTicketsNewRoute: AuthenticatedTicketsNewRoute,
