@@ -20,6 +20,14 @@ import { Route as AuthenticatedTicketsIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedTicketsNewRouteImport } from './routes/_authenticated/tickets.new'
 import { Route as AuthenticatedTicketsIdRouteImport } from './routes/_authenticated/tickets.$id'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
+import { Route as AuthenticatedAdminRankingRouteImport } from './routes/_authenticated/admin.ranking'
+import { Route as AuthenticatedAdminExecutiveRouteImport } from './routes/_authenticated/admin.executive'
+import { Route as AuthenticatedAdminCompareRouteImport } from './routes/_authenticated/admin.compare'
+import { Route as AuthenticatedAdminActivityRouteImport } from './routes/_authenticated/admin.activity'
+import { Route as AuthenticatedAdminTechniciansIndexRouteImport } from './routes/_authenticated/admin.technicians.index'
+import { Route as AuthenticatedTicketsIdRateRouteImport } from './routes/_authenticated/tickets.$id.rate'
+import { Route as AuthenticatedAdminTicketsIdRouteImport } from './routes/_authenticated/admin.tickets.$id'
+import { Route as AuthenticatedAdminTechniciansIdRouteImport } from './routes/_authenticated/admin.technicians.$id'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -77,6 +85,54 @@ const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   path: '/admin/users',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminRankingRoute =
+  AuthenticatedAdminRankingRouteImport.update({
+    id: '/admin/ranking',
+    path: '/admin/ranking',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminExecutiveRoute =
+  AuthenticatedAdminExecutiveRouteImport.update({
+    id: '/admin/executive',
+    path: '/admin/executive',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminCompareRoute =
+  AuthenticatedAdminCompareRouteImport.update({
+    id: '/admin/compare',
+    path: '/admin/compare',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminActivityRoute =
+  AuthenticatedAdminActivityRouteImport.update({
+    id: '/admin/activity',
+    path: '/admin/activity',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminTechniciansIndexRoute =
+  AuthenticatedAdminTechniciansIndexRouteImport.update({
+    id: '/admin/technicians/',
+    path: '/admin/technicians/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTicketsIdRateRoute =
+  AuthenticatedTicketsIdRateRouteImport.update({
+    id: '/rate',
+    path: '/rate',
+    getParentRoute: () => AuthenticatedTicketsIdRoute,
+  } as any)
+const AuthenticatedAdminTicketsIdRoute =
+  AuthenticatedAdminTicketsIdRouteImport.update({
+    id: '/admin/tickets/$id',
+    path: '/admin/tickets/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminTechniciansIdRoute =
+  AuthenticatedAdminTechniciansIdRouteImport.update({
+    id: '/admin/technicians/$id',
+    path: '/admin/technicians/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -85,10 +141,18 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/stats': typeof AuthenticatedStatsRoute
+  '/admin/activity': typeof AuthenticatedAdminActivityRoute
+  '/admin/compare': typeof AuthenticatedAdminCompareRoute
+  '/admin/executive': typeof AuthenticatedAdminExecutiveRoute
+  '/admin/ranking': typeof AuthenticatedAdminRankingRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
-  '/tickets/$id': typeof AuthenticatedTicketsIdRoute
+  '/tickets/$id': typeof AuthenticatedTicketsIdRouteWithChildren
   '/tickets/new': typeof AuthenticatedTicketsNewRoute
   '/tickets/': typeof AuthenticatedTicketsIndexRoute
+  '/admin/technicians/$id': typeof AuthenticatedAdminTechniciansIdRoute
+  '/admin/tickets/$id': typeof AuthenticatedAdminTicketsIdRoute
+  '/tickets/$id/rate': typeof AuthenticatedTicketsIdRateRoute
+  '/admin/technicians/': typeof AuthenticatedAdminTechniciansIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -97,10 +161,18 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/stats': typeof AuthenticatedStatsRoute
+  '/admin/activity': typeof AuthenticatedAdminActivityRoute
+  '/admin/compare': typeof AuthenticatedAdminCompareRoute
+  '/admin/executive': typeof AuthenticatedAdminExecutiveRoute
+  '/admin/ranking': typeof AuthenticatedAdminRankingRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
-  '/tickets/$id': typeof AuthenticatedTicketsIdRoute
+  '/tickets/$id': typeof AuthenticatedTicketsIdRouteWithChildren
   '/tickets/new': typeof AuthenticatedTicketsNewRoute
   '/tickets': typeof AuthenticatedTicketsIndexRoute
+  '/admin/technicians/$id': typeof AuthenticatedAdminTechniciansIdRoute
+  '/admin/tickets/$id': typeof AuthenticatedAdminTicketsIdRoute
+  '/tickets/$id/rate': typeof AuthenticatedTicketsIdRateRoute
+  '/admin/technicians': typeof AuthenticatedAdminTechniciansIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -111,10 +183,18 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/stats': typeof AuthenticatedStatsRoute
+  '/_authenticated/admin/activity': typeof AuthenticatedAdminActivityRoute
+  '/_authenticated/admin/compare': typeof AuthenticatedAdminCompareRoute
+  '/_authenticated/admin/executive': typeof AuthenticatedAdminExecutiveRoute
+  '/_authenticated/admin/ranking': typeof AuthenticatedAdminRankingRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
-  '/_authenticated/tickets/$id': typeof AuthenticatedTicketsIdRoute
+  '/_authenticated/tickets/$id': typeof AuthenticatedTicketsIdRouteWithChildren
   '/_authenticated/tickets/new': typeof AuthenticatedTicketsNewRoute
   '/_authenticated/tickets/': typeof AuthenticatedTicketsIndexRoute
+  '/_authenticated/admin/technicians/$id': typeof AuthenticatedAdminTechniciansIdRoute
+  '/_authenticated/admin/tickets/$id': typeof AuthenticatedAdminTicketsIdRoute
+  '/_authenticated/tickets/$id/rate': typeof AuthenticatedTicketsIdRateRoute
+  '/_authenticated/admin/technicians/': typeof AuthenticatedAdminTechniciansIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -125,10 +205,18 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/notifications'
     | '/stats'
+    | '/admin/activity'
+    | '/admin/compare'
+    | '/admin/executive'
+    | '/admin/ranking'
     | '/admin/users'
     | '/tickets/$id'
     | '/tickets/new'
     | '/tickets/'
+    | '/admin/technicians/$id'
+    | '/admin/tickets/$id'
+    | '/tickets/$id/rate'
+    | '/admin/technicians/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -137,10 +225,18 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/notifications'
     | '/stats'
+    | '/admin/activity'
+    | '/admin/compare'
+    | '/admin/executive'
+    | '/admin/ranking'
     | '/admin/users'
     | '/tickets/$id'
     | '/tickets/new'
     | '/tickets'
+    | '/admin/technicians/$id'
+    | '/admin/tickets/$id'
+    | '/tickets/$id/rate'
+    | '/admin/technicians'
   id:
     | '__root__'
     | '/'
@@ -150,10 +246,18 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/notifications'
     | '/_authenticated/stats'
+    | '/_authenticated/admin/activity'
+    | '/_authenticated/admin/compare'
+    | '/_authenticated/admin/executive'
+    | '/_authenticated/admin/ranking'
     | '/_authenticated/admin/users'
     | '/_authenticated/tickets/$id'
     | '/_authenticated/tickets/new'
     | '/_authenticated/tickets/'
+    | '/_authenticated/admin/technicians/$id'
+    | '/_authenticated/admin/tickets/$id'
+    | '/_authenticated/tickets/$id/rate'
+    | '/_authenticated/admin/technicians/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -242,27 +346,112 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/ranking': {
+      id: '/_authenticated/admin/ranking'
+      path: '/admin/ranking'
+      fullPath: '/admin/ranking'
+      preLoaderRoute: typeof AuthenticatedAdminRankingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/executive': {
+      id: '/_authenticated/admin/executive'
+      path: '/admin/executive'
+      fullPath: '/admin/executive'
+      preLoaderRoute: typeof AuthenticatedAdminExecutiveRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/compare': {
+      id: '/_authenticated/admin/compare'
+      path: '/admin/compare'
+      fullPath: '/admin/compare'
+      preLoaderRoute: typeof AuthenticatedAdminCompareRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/activity': {
+      id: '/_authenticated/admin/activity'
+      path: '/admin/activity'
+      fullPath: '/admin/activity'
+      preLoaderRoute: typeof AuthenticatedAdminActivityRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/technicians/': {
+      id: '/_authenticated/admin/technicians/'
+      path: '/admin/technicians'
+      fullPath: '/admin/technicians/'
+      preLoaderRoute: typeof AuthenticatedAdminTechniciansIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tickets/$id/rate': {
+      id: '/_authenticated/tickets/$id/rate'
+      path: '/rate'
+      fullPath: '/tickets/$id/rate'
+      preLoaderRoute: typeof AuthenticatedTicketsIdRateRouteImport
+      parentRoute: typeof AuthenticatedTicketsIdRoute
+    }
+    '/_authenticated/admin/tickets/$id': {
+      id: '/_authenticated/admin/tickets/$id'
+      path: '/admin/tickets/$id'
+      fullPath: '/admin/tickets/$id'
+      preLoaderRoute: typeof AuthenticatedAdminTicketsIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/technicians/$id': {
+      id: '/_authenticated/admin/technicians/$id'
+      path: '/admin/technicians/$id'
+      fullPath: '/admin/technicians/$id'
+      preLoaderRoute: typeof AuthenticatedAdminTechniciansIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
+
+interface AuthenticatedTicketsIdRouteChildren {
+  AuthenticatedTicketsIdRateRoute: typeof AuthenticatedTicketsIdRateRoute
+}
+
+const AuthenticatedTicketsIdRouteChildren: AuthenticatedTicketsIdRouteChildren =
+  {
+    AuthenticatedTicketsIdRateRoute: AuthenticatedTicketsIdRateRoute,
+  }
+
+const AuthenticatedTicketsIdRouteWithChildren =
+  AuthenticatedTicketsIdRoute._addFileChildren(
+    AuthenticatedTicketsIdRouteChildren,
+  )
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedStatsRoute: typeof AuthenticatedStatsRoute
+  AuthenticatedAdminActivityRoute: typeof AuthenticatedAdminActivityRoute
+  AuthenticatedAdminCompareRoute: typeof AuthenticatedAdminCompareRoute
+  AuthenticatedAdminExecutiveRoute: typeof AuthenticatedAdminExecutiveRoute
+  AuthenticatedAdminRankingRoute: typeof AuthenticatedAdminRankingRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
-  AuthenticatedTicketsIdRoute: typeof AuthenticatedTicketsIdRoute
+  AuthenticatedTicketsIdRoute: typeof AuthenticatedTicketsIdRouteWithChildren
   AuthenticatedTicketsNewRoute: typeof AuthenticatedTicketsNewRoute
   AuthenticatedTicketsIndexRoute: typeof AuthenticatedTicketsIndexRoute
+  AuthenticatedAdminTechniciansIdRoute: typeof AuthenticatedAdminTechniciansIdRoute
+  AuthenticatedAdminTicketsIdRoute: typeof AuthenticatedAdminTicketsIdRoute
+  AuthenticatedAdminTechniciansIndexRoute: typeof AuthenticatedAdminTechniciansIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedStatsRoute: AuthenticatedStatsRoute,
+  AuthenticatedAdminActivityRoute: AuthenticatedAdminActivityRoute,
+  AuthenticatedAdminCompareRoute: AuthenticatedAdminCompareRoute,
+  AuthenticatedAdminExecutiveRoute: AuthenticatedAdminExecutiveRoute,
+  AuthenticatedAdminRankingRoute: AuthenticatedAdminRankingRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
-  AuthenticatedTicketsIdRoute: AuthenticatedTicketsIdRoute,
+  AuthenticatedTicketsIdRoute: AuthenticatedTicketsIdRouteWithChildren,
   AuthenticatedTicketsNewRoute: AuthenticatedTicketsNewRoute,
   AuthenticatedTicketsIndexRoute: AuthenticatedTicketsIndexRoute,
+  AuthenticatedAdminTechniciansIdRoute: AuthenticatedAdminTechniciansIdRoute,
+  AuthenticatedAdminTicketsIdRoute: AuthenticatedAdminTicketsIdRoute,
+  AuthenticatedAdminTechniciansIndexRoute:
+    AuthenticatedAdminTechniciansIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

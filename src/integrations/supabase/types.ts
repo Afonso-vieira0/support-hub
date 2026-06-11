@@ -14,6 +14,47 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_events: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          from_value: string | null
+          id: string
+          metadata: Json
+          ticket_id: string | null
+          to_value: string | null
+          type: Database["public"]["Enums"]["activity_type"]
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          from_value?: string | null
+          id?: string
+          metadata?: Json
+          ticket_id?: string | null
+          to_value?: string | null
+          type: Database["public"]["Enums"]["activity_type"]
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          from_value?: string | null
+          id?: string
+          metadata?: Json
+          ticket_id?: string | null
+          to_value?: string | null
+          type?: Database["public"]["Enums"]["activity_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_events_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       attachments: {
         Row: {
           created_at: string
@@ -64,6 +105,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      login_events: {
+        Row: {
+          created_at: string
+          id: string
+          role_snapshot: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role_snapshot?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role_snapshot?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       messages: {
         Row: {
@@ -221,6 +283,100 @@ export type Database = {
           },
         ]
       }
+      ticket_metrics: {
+        Row: {
+          client_wait_seconds: number
+          closed_at: string | null
+          first_response_at: string | null
+          first_tech_open_at: string | null
+          last_client_message_at: string | null
+          last_tech_message_at: string | null
+          messages_count: number
+          resolved_at: string | null
+          tech_wait_seconds: number
+          ticket_id: string
+          time_to_first_response_seconds: number | null
+          total_resolution_seconds: number | null
+          updated_at: string
+        }
+        Insert: {
+          client_wait_seconds?: number
+          closed_at?: string | null
+          first_response_at?: string | null
+          first_tech_open_at?: string | null
+          last_client_message_at?: string | null
+          last_tech_message_at?: string | null
+          messages_count?: number
+          resolved_at?: string | null
+          tech_wait_seconds?: number
+          ticket_id: string
+          time_to_first_response_seconds?: number | null
+          total_resolution_seconds?: number | null
+          updated_at?: string
+        }
+        Update: {
+          client_wait_seconds?: number
+          closed_at?: string | null
+          first_response_at?: string | null
+          first_tech_open_at?: string | null
+          last_client_message_at?: string | null
+          last_tech_message_at?: string | null
+          messages_count?: number
+          resolved_at?: string | null
+          tech_wait_seconds?: number
+          ticket_id?: string
+          time_to_first_response_seconds?: number | null
+          total_resolution_seconds?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_metrics_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: true
+            referencedRelation: "tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ticket_ratings: {
+        Row: {
+          client_id: string
+          comment: string | null
+          created_at: string
+          solved: boolean
+          stars: number
+          technician_id: string | null
+          ticket_id: string
+        }
+        Insert: {
+          client_id: string
+          comment?: string | null
+          created_at?: string
+          solved: boolean
+          stars: number
+          technician_id?: string | null
+          ticket_id: string
+        }
+        Update: {
+          client_id?: string
+          comment?: string | null
+          created_at?: string
+          solved?: boolean
+          stars?: number
+          technician_id?: string | null
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_ratings_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: true
+            referencedRelation: "tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tickets: {
         Row: {
           brand: string
@@ -306,6 +462,18 @@ export type Database = {
       is_technician: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
+      activity_type:
+        | "ticket_created"
+        | "ticket_assigned"
+        | "ticket_reassigned"
+        | "first_response"
+        | "client_replied"
+        | "technician_replied"
+        | "status_changed"
+        | "ticket_resolved"
+        | "ticket_closed"
+        | "rating_received"
+        | "user_login"
       app_role: "super_admin" | "admin" | "technician" | "client"
       ticket_category:
         | "hardware"
@@ -450,6 +618,19 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      activity_type: [
+        "ticket_created",
+        "ticket_assigned",
+        "ticket_reassigned",
+        "first_response",
+        "client_replied",
+        "technician_replied",
+        "status_changed",
+        "ticket_resolved",
+        "ticket_closed",
+        "rating_received",
+        "user_login",
+      ],
       app_role: ["super_admin", "admin", "technician", "client"],
       ticket_category: [
         "hardware",
