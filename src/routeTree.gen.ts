@@ -20,6 +20,7 @@ import { Route as AuthenticatedTicketsIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedTicketsNewRouteImport } from './routes/_authenticated/tickets.new'
 import { Route as AuthenticatedTicketsIdRouteImport } from './routes/_authenticated/tickets.$id'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
+import { Route as AuthenticatedAdminRankingRouteImport } from './routes/_authenticated/admin.ranking'
 import { Route as AuthenticatedAdminCompareRouteImport } from './routes/_authenticated/admin.compare'
 import { Route as AuthenticatedAdminActivityRouteImport } from './routes/_authenticated/admin.activity'
 import { Route as AuthenticatedAdminTechniciansIndexRouteImport } from './routes/_authenticated/admin.technicians.index'
@@ -82,6 +83,12 @@ const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   path: '/admin/users',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminRankingRoute =
+  AuthenticatedAdminRankingRouteImport.update({
+    id: '/admin/ranking',
+    path: '/admin/ranking',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminCompareRoute =
   AuthenticatedAdminCompareRouteImport.update({
     id: '/admin/compare',
@@ -122,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/stats': typeof AuthenticatedStatsRoute
   '/admin/activity': typeof AuthenticatedAdminActivityRoute
   '/admin/compare': typeof AuthenticatedAdminCompareRoute
+  '/admin/ranking': typeof AuthenticatedAdminRankingRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/tickets/$id': typeof AuthenticatedTicketsIdRouteWithChildren
   '/tickets/new': typeof AuthenticatedTicketsNewRoute
@@ -139,6 +147,7 @@ export interface FileRoutesByTo {
   '/stats': typeof AuthenticatedStatsRoute
   '/admin/activity': typeof AuthenticatedAdminActivityRoute
   '/admin/compare': typeof AuthenticatedAdminCompareRoute
+  '/admin/ranking': typeof AuthenticatedAdminRankingRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/tickets/$id': typeof AuthenticatedTicketsIdRouteWithChildren
   '/tickets/new': typeof AuthenticatedTicketsNewRoute
@@ -158,6 +167,7 @@ export interface FileRoutesById {
   '/_authenticated/stats': typeof AuthenticatedStatsRoute
   '/_authenticated/admin/activity': typeof AuthenticatedAdminActivityRoute
   '/_authenticated/admin/compare': typeof AuthenticatedAdminCompareRoute
+  '/_authenticated/admin/ranking': typeof AuthenticatedAdminRankingRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/tickets/$id': typeof AuthenticatedTicketsIdRouteWithChildren
   '/_authenticated/tickets/new': typeof AuthenticatedTicketsNewRoute
@@ -177,6 +187,7 @@ export interface FileRouteTypes {
     | '/stats'
     | '/admin/activity'
     | '/admin/compare'
+    | '/admin/ranking'
     | '/admin/users'
     | '/tickets/$id'
     | '/tickets/new'
@@ -194,6 +205,7 @@ export interface FileRouteTypes {
     | '/stats'
     | '/admin/activity'
     | '/admin/compare'
+    | '/admin/ranking'
     | '/admin/users'
     | '/tickets/$id'
     | '/tickets/new'
@@ -212,6 +224,7 @@ export interface FileRouteTypes {
     | '/_authenticated/stats'
     | '/_authenticated/admin/activity'
     | '/_authenticated/admin/compare'
+    | '/_authenticated/admin/ranking'
     | '/_authenticated/admin/users'
     | '/_authenticated/tickets/$id'
     | '/_authenticated/tickets/new'
@@ -307,6 +320,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/ranking': {
+      id: '/_authenticated/admin/ranking'
+      path: '/admin/ranking'
+      fullPath: '/admin/ranking'
+      preLoaderRoute: typeof AuthenticatedAdminRankingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/compare': {
       id: '/_authenticated/admin/compare'
       path: '/admin/compare'
@@ -365,6 +385,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedStatsRoute: typeof AuthenticatedStatsRoute
   AuthenticatedAdminActivityRoute: typeof AuthenticatedAdminActivityRoute
   AuthenticatedAdminCompareRoute: typeof AuthenticatedAdminCompareRoute
+  AuthenticatedAdminRankingRoute: typeof AuthenticatedAdminRankingRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedTicketsIdRoute: typeof AuthenticatedTicketsIdRouteWithChildren
   AuthenticatedTicketsNewRoute: typeof AuthenticatedTicketsNewRoute
@@ -379,6 +400,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedStatsRoute: AuthenticatedStatsRoute,
   AuthenticatedAdminActivityRoute: AuthenticatedAdminActivityRoute,
   AuthenticatedAdminCompareRoute: AuthenticatedAdminCompareRoute,
+  AuthenticatedAdminRankingRoute: AuthenticatedAdminRankingRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedTicketsIdRoute: AuthenticatedTicketsIdRouteWithChildren,
   AuthenticatedTicketsNewRoute: AuthenticatedTicketsNewRoute,
