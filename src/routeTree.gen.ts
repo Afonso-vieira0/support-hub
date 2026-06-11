@@ -21,6 +21,7 @@ import { Route as AuthenticatedTicketsNewRouteImport } from './routes/_authentic
 import { Route as AuthenticatedTicketsIdRouteImport } from './routes/_authenticated/tickets.$id'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminActivityRouteImport } from './routes/_authenticated/admin.activity'
+import { Route as AuthenticatedAdminTechniciansIndexRouteImport } from './routes/_authenticated/admin.technicians.index'
 import { Route as AuthenticatedTicketsIdRateRouteImport } from './routes/_authenticated/tickets.$id.rate'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -85,6 +86,12 @@ const AuthenticatedAdminActivityRoute =
     path: '/admin/activity',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminTechniciansIndexRoute =
+  AuthenticatedAdminTechniciansIndexRouteImport.update({
+    id: '/admin/technicians/',
+    path: '/admin/technicians/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedTicketsIdRateRoute =
   AuthenticatedTicketsIdRateRouteImport.update({
     id: '/rate',
@@ -105,6 +112,7 @@ export interface FileRoutesByFullPath {
   '/tickets/new': typeof AuthenticatedTicketsNewRoute
   '/tickets/': typeof AuthenticatedTicketsIndexRoute
   '/tickets/$id/rate': typeof AuthenticatedTicketsIdRateRoute
+  '/admin/technicians/': typeof AuthenticatedAdminTechniciansIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -119,6 +127,7 @@ export interface FileRoutesByTo {
   '/tickets/new': typeof AuthenticatedTicketsNewRoute
   '/tickets': typeof AuthenticatedTicketsIndexRoute
   '/tickets/$id/rate': typeof AuthenticatedTicketsIdRateRoute
+  '/admin/technicians': typeof AuthenticatedAdminTechniciansIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -135,6 +144,7 @@ export interface FileRoutesById {
   '/_authenticated/tickets/new': typeof AuthenticatedTicketsNewRoute
   '/_authenticated/tickets/': typeof AuthenticatedTicketsIndexRoute
   '/_authenticated/tickets/$id/rate': typeof AuthenticatedTicketsIdRateRoute
+  '/_authenticated/admin/technicians/': typeof AuthenticatedAdminTechniciansIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -151,6 +161,7 @@ export interface FileRouteTypes {
     | '/tickets/new'
     | '/tickets/'
     | '/tickets/$id/rate'
+    | '/admin/technicians/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -165,6 +176,7 @@ export interface FileRouteTypes {
     | '/tickets/new'
     | '/tickets'
     | '/tickets/$id/rate'
+    | '/admin/technicians'
   id:
     | '__root__'
     | '/'
@@ -180,6 +192,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tickets/new'
     | '/_authenticated/tickets/'
     | '/_authenticated/tickets/$id/rate'
+    | '/_authenticated/admin/technicians/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -275,6 +288,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminActivityRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/technicians/': {
+      id: '/_authenticated/admin/technicians/'
+      path: '/admin/technicians'
+      fullPath: '/admin/technicians/'
+      preLoaderRoute: typeof AuthenticatedAdminTechniciansIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/tickets/$id/rate': {
       id: '/_authenticated/tickets/$id/rate'
       path: '/rate'
@@ -308,6 +328,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTicketsIdRoute: typeof AuthenticatedTicketsIdRouteWithChildren
   AuthenticatedTicketsNewRoute: typeof AuthenticatedTicketsNewRoute
   AuthenticatedTicketsIndexRoute: typeof AuthenticatedTicketsIndexRoute
+  AuthenticatedAdminTechniciansIndexRoute: typeof AuthenticatedAdminTechniciansIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -319,6 +340,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTicketsIdRoute: AuthenticatedTicketsIdRouteWithChildren,
   AuthenticatedTicketsNewRoute: AuthenticatedTicketsNewRoute,
   AuthenticatedTicketsIndexRoute: AuthenticatedTicketsIndexRoute,
+  AuthenticatedAdminTechniciansIndexRoute:
+    AuthenticatedAdminTechniciansIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
