@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,18 +10,32 @@ import { StatusBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
 import { CATEGORIES, categoryIcon, categoryLabel } from "@/lib/categories";
 import { STATUSES, type TicketStatus } from "@/lib/statuses";
-import { Plus, Search, Ticket as TicketIcon } from "lucide-react";
+import { Plus, Search, Ticket as TicketIcon, Trash2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { softDeleteTickets } from "@/lib/tickets.functions";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/tickets/")({
   component: TicketsListPage,
 });
 
 function TicketsListPage() {
-  const { user, isClient, isAdmin } = useAuth();
+  const { user, isClient, isAdmin, isTechnician } = useAuth();
+  const queryClient = useQueryClient();
+  const softDelete = useServerFn(softDeleteTickets);
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<string>("all");
   const [category, setCategory] = useState<string>("all");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [reason, setReason] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   const { data: tickets = [], isLoading } = useQuery({
     queryKey: ["tickets-list", user?.id],
@@ -42,6 +57,47 @@ function TicketsListPage() {
     return true;
   });
 
+  const canDelete = (t: any) => isAdmin || (isTechnician && t.technician_id === user?.id);
+  const deletableVisible = filtered.filter(canDelete);
+  const showSelection = deletableVisible.length > 0;
+  const allSelected = showSelection && deletableVisible.every((t) => selected.has(t.id));
+
+  const toggleOne = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+  const toggleAll = () => {
+    setSelected((prev) => {
+      if (allSelected) {
+        const next = new Set(prev);
+        deletableVisible.forEach((t) => next.delete(t.id));
+        return next;
+      }
+      const next = new Set(prev);
+      deletableVisible.forEach((t) => next.add(t.id));
+      return next;
+    });
+  };
+
+  const confirmDelete = async () => {
+    setDeleting(true);
+    try {
+      const res = await softDelete({ data: { ids: Array.from(selected), reason: reason.trim() || undefined } });
+      toast.success(`${res.count} ticket(s) movido(s) para o lixo`);
+      setSelected(new Set());
+      setReason("");
+      setConfirmOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["tickets-list"] });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Erro ao apagar");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -49,11 +105,18 @@ function TicketsListPage() {
           <h1 className="text-2xl font-bold tracking-tight">Tickets</h1>
           <p className="text-sm text-muted-foreground">{filtered.length} resultado(s)</p>
         </div>
-        {(isClient || isAdmin) && (
-          <Button asChild>
-            <Link to="/tickets/new"><Plus className="mr-2 h-4 w-4" />Novo ticket</Link>
-          </Button>
-        )}
+        <div className="flex items-center gap-2">
+          {selected.size > 0 && (
+            <Button variant="destructive" onClick={() => setConfirmOpen(true)}>
+              <Trash2 className="mr-2 h-4 w-4" /> Apagar selecionados ({selected.size})
+            </Button>
+          )}
+          {(isClient || isAdmin) && (
+            <Button asChild>
+              <Link to="/tickets/new"><Plus className="mr-2 h-4 w-4" />Novo ticket</Link>
+            </Button>
+          )}
+        </div>
       </div>
 
       <Card>
@@ -90,23 +153,58 @@ function TicketsListPage() {
             </div>
           ) : (
             <div className="divide-y">
+              {showSelection && (
+                <div className="flex items-center gap-3 bg-muted/30 px-4 py-2 text-xs text-muted-foreground">
+                  <Checkbox checked={allSelected} onCheckedChange={toggleAll} aria-label="Selecionar todos" />
+                  <span>Selecionar todos ({deletableVisible.length} apagáveis)</span>
+                </div>
+              )}
               {filtered.map((t) => (
-                <Link key={t.id} to="/tickets/$id" params={{ id: t.id }} className="flex items-center gap-4 px-4 py-3 transition-colors hover:bg-muted/40">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent text-lg">{categoryIcon(t.category as any)}</div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-xs font-mono text-muted-foreground">#{t.ticket_number}</span>
-                      <p className="truncate text-sm font-medium">{t.device_name}</p>
+                <div key={t.id} className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/40">
+                  {canDelete(t) ? (
+                    <Checkbox
+                      checked={selected.has(t.id)}
+                      onCheckedChange={() => toggleOne(t.id)}
+                      aria-label="Selecionar ticket"
+                    />
+                  ) : (
+                    <div className="h-4 w-4" />
+                  )}
+                  <Link to="/tickets/$id" params={{ id: t.id }} className="flex flex-1 items-center gap-4">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent text-lg">{categoryIcon(t.category as any)}</div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-xs font-mono text-muted-foreground">#{t.ticket_number}</span>
+                        <p className="truncate text-sm font-medium">{t.device_name}</p>
+                      </div>
+                      <p className="truncate text-xs text-muted-foreground">{t.brand} {t.model} · {categoryLabel(t.category as any)}</p>
                     </div>
-                    <p className="truncate text-xs text-muted-foreground">{t.brand} {t.model} · {categoryLabel(t.category as any)}</p>
-                  </div>
-                  <StatusBadge status={t.status as TicketStatus} />
-                </Link>
+                    <StatusBadge status={t.status as TicketStatus} />
+                  </Link>
+                </div>
               ))}
             </div>
           )}
         </CardContent>
       </Card>
+
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Apagar {selected.size} ticket(s)?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Os tickets vão para o lixo e podem ser restaurados por um administrador.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <Textarea placeholder="Motivo (opcional)" value={reason} onChange={(e) => setReason(e.target.value)} />
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} disabled={deleting}>
+              {deleting ? "A apagar…" : "Apagar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
