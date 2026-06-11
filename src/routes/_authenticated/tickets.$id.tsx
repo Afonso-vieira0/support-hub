@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,10 +12,17 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { StatusBadge } from "@/components/status-badge";
 import { STATUSES, type TicketStatus } from "@/lib/statuses";
 import { categoryIcon, categoryLabel } from "@/lib/categories";
-import { ArrowLeft, Send, Paperclip, Download } from "lucide-react";
+import { ArrowLeft, Send, Paperclip, Download, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Star } from "lucide-react";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { softDeleteTickets } from "@/lib/tickets.functions";
 
 export const Route = createFileRoute("/_authenticated/tickets/$id")({
   component: TicketDetailPage,
@@ -27,6 +35,9 @@ function TicketDetailPage() {
   const queryClient = useQueryClient();
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
+  const [deleteReason, setDeleteReason] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const softDelete = useServerFn(softDeleteTickets);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const { data: ticket } = useQuery({
@@ -114,6 +125,19 @@ function TicketDetailPage() {
     toast.success("Estado atualizado");
   };
 
+  const onDelete = async () => {
+    setDeleting(true);
+    try {
+      await softDelete({ data: { ids: [id], reason: deleteReason.trim() || undefined } });
+      toast.success("Ticket movido para o lixo");
+      queryClient.invalidateQueries({ queryKey: ["tickets-list"] });
+      navigate({ to: "/tickets" });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Erro ao apagar");
+      setDeleting(false);
+    }
+  };
+
   const uploadAttachment = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     if (!f || !user) return;
@@ -147,6 +171,7 @@ function TicketDetailPage() {
   }
 
   const canManage = isAdmin || (isTechnician && ticket.technician_id === user?.id);
+  const canDelete = canManage;
   const showRateCta =
     !isAdmin && !isTechnician &&
     ticket.client_id === user?.id &&
@@ -154,9 +179,35 @@ function TicketDetailPage() {
 
   return (
     <div className="space-y-4">
-      <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/tickets" })}>
-        <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
-      </Button>
+      <div className="flex items-center justify-between gap-2">
+        <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/tickets" })}>
+          <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
+        </Button>
+        {canDelete && (
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="outline" size="sm" className="text-destructive hover:text-destructive">
+                <Trash2 className="mr-2 h-4 w-4" /> Apagar
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Apagar este ticket?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Vai para o lixo e pode ser restaurado por um administrador.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <Textarea placeholder="Motivo (opcional)" value={deleteReason} onChange={(e) => setDeleteReason(e.target.value)} />
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={deleting}>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={onDelete} disabled={deleting}>
+                  {deleting ? "A apagar…" : "Apagar"}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
+      </div>
 
       {showRateCta && (
         <Card className="border-primary/40 bg-primary/5">
