@@ -20,6 +20,7 @@ import { Route as AuthenticatedTicketsIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedTicketsNewRouteImport } from './routes/_authenticated/tickets.new'
 import { Route as AuthenticatedTicketsIdRouteImport } from './routes/_authenticated/tickets.$id'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
+import { Route as AuthenticatedTicketsIdRateRouteImport } from './routes/_authenticated/tickets.$id.rate'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -77,6 +78,12 @@ const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   path: '/admin/users',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedTicketsIdRateRoute =
+  AuthenticatedTicketsIdRateRouteImport.update({
+    id: '/rate',
+    path: '/rate',
+    getParentRoute: () => AuthenticatedTicketsIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -86,9 +93,10 @@ export interface FileRoutesByFullPath {
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/stats': typeof AuthenticatedStatsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
-  '/tickets/$id': typeof AuthenticatedTicketsIdRoute
+  '/tickets/$id': typeof AuthenticatedTicketsIdRouteWithChildren
   '/tickets/new': typeof AuthenticatedTicketsNewRoute
   '/tickets/': typeof AuthenticatedTicketsIndexRoute
+  '/tickets/$id/rate': typeof AuthenticatedTicketsIdRateRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -98,9 +106,10 @@ export interface FileRoutesByTo {
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/stats': typeof AuthenticatedStatsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
-  '/tickets/$id': typeof AuthenticatedTicketsIdRoute
+  '/tickets/$id': typeof AuthenticatedTicketsIdRouteWithChildren
   '/tickets/new': typeof AuthenticatedTicketsNewRoute
   '/tickets': typeof AuthenticatedTicketsIndexRoute
+  '/tickets/$id/rate': typeof AuthenticatedTicketsIdRateRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -112,9 +121,10 @@ export interface FileRoutesById {
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/stats': typeof AuthenticatedStatsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
-  '/_authenticated/tickets/$id': typeof AuthenticatedTicketsIdRoute
+  '/_authenticated/tickets/$id': typeof AuthenticatedTicketsIdRouteWithChildren
   '/_authenticated/tickets/new': typeof AuthenticatedTicketsNewRoute
   '/_authenticated/tickets/': typeof AuthenticatedTicketsIndexRoute
+  '/_authenticated/tickets/$id/rate': typeof AuthenticatedTicketsIdRateRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -129,6 +139,7 @@ export interface FileRouteTypes {
     | '/tickets/$id'
     | '/tickets/new'
     | '/tickets/'
+    | '/tickets/$id/rate'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -141,6 +152,7 @@ export interface FileRouteTypes {
     | '/tickets/$id'
     | '/tickets/new'
     | '/tickets'
+    | '/tickets/$id/rate'
   id:
     | '__root__'
     | '/'
@@ -154,6 +166,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tickets/$id'
     | '/_authenticated/tickets/new'
     | '/_authenticated/tickets/'
+    | '/_authenticated/tickets/$id/rate'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -242,15 +255,36 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/tickets/$id/rate': {
+      id: '/_authenticated/tickets/$id/rate'
+      path: '/rate'
+      fullPath: '/tickets/$id/rate'
+      preLoaderRoute: typeof AuthenticatedTicketsIdRateRouteImport
+      parentRoute: typeof AuthenticatedTicketsIdRoute
+    }
   }
 }
+
+interface AuthenticatedTicketsIdRouteChildren {
+  AuthenticatedTicketsIdRateRoute: typeof AuthenticatedTicketsIdRateRoute
+}
+
+const AuthenticatedTicketsIdRouteChildren: AuthenticatedTicketsIdRouteChildren =
+  {
+    AuthenticatedTicketsIdRateRoute: AuthenticatedTicketsIdRateRoute,
+  }
+
+const AuthenticatedTicketsIdRouteWithChildren =
+  AuthenticatedTicketsIdRoute._addFileChildren(
+    AuthenticatedTicketsIdRouteChildren,
+  )
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedStatsRoute: typeof AuthenticatedStatsRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
-  AuthenticatedTicketsIdRoute: typeof AuthenticatedTicketsIdRoute
+  AuthenticatedTicketsIdRoute: typeof AuthenticatedTicketsIdRouteWithChildren
   AuthenticatedTicketsNewRoute: typeof AuthenticatedTicketsNewRoute
   AuthenticatedTicketsIndexRoute: typeof AuthenticatedTicketsIndexRoute
 }
@@ -260,7 +294,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedStatsRoute: AuthenticatedStatsRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
-  AuthenticatedTicketsIdRoute: AuthenticatedTicketsIdRoute,
+  AuthenticatedTicketsIdRoute: AuthenticatedTicketsIdRouteWithChildren,
   AuthenticatedTicketsNewRoute: AuthenticatedTicketsNewRoute,
   AuthenticatedTicketsIndexRoute: AuthenticatedTicketsIndexRoute,
 }
@@ -277,3 +311,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
