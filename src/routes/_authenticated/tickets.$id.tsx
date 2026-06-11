@@ -14,6 +14,7 @@ import { categoryIcon, categoryLabel } from "@/lib/categories";
 import { ArrowLeft, Send, Paperclip, Download } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { Star } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/tickets/$id")({
   component: TicketDetailPage,
@@ -146,12 +147,31 @@ function TicketDetailPage() {
   }
 
   const canManage = isAdmin || (isTechnician && ticket.technician_id === user?.id);
+  const showRateCta =
+    !isAdmin && !isTechnician &&
+    ticket.client_id === user?.id &&
+    (ticket.status === "resolved" || ticket.status === "closed");
 
   return (
     <div className="space-y-4">
       <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/tickets" })}>
         <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
       </Button>
+
+      {showRateCta && (
+        <Card className="border-primary/40 bg-primary/5">
+          <CardContent className="flex flex-wrap items-center justify-between gap-3 p-4">
+            <div className="flex items-center gap-3">
+              <Star className="h-5 w-5 text-warning" />
+              <div>
+                <p className="text-sm font-medium">O seu ticket foi resolvido</p>
+                <p className="text-xs text-muted-foreground">Avalie o atendimento do técnico.</p>
+              </div>
+            </div>
+            <Button onClick={() => navigate({ to: "/tickets/$id/rate", params: { id } })}>Avaliar atendimento</Button>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
         <Card className="flex h-[70vh] min-h-[500px] flex-col">
