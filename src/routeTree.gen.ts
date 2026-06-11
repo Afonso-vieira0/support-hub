@@ -20,6 +20,7 @@ import { Route as AuthenticatedTicketsIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedTicketsNewRouteImport } from './routes/_authenticated/tickets.new'
 import { Route as AuthenticatedTicketsIdRouteImport } from './routes/_authenticated/tickets.$id'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
+import { Route as AuthenticatedAdminActivityRouteImport } from './routes/_authenticated/admin.activity'
 import { Route as AuthenticatedTicketsIdRateRouteImport } from './routes/_authenticated/tickets.$id.rate'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -78,6 +79,12 @@ const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   path: '/admin/users',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminActivityRoute =
+  AuthenticatedAdminActivityRouteImport.update({
+    id: '/admin/activity',
+    path: '/admin/activity',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedTicketsIdRateRoute =
   AuthenticatedTicketsIdRateRouteImport.update({
     id: '/rate',
@@ -92,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/stats': typeof AuthenticatedStatsRoute
+  '/admin/activity': typeof AuthenticatedAdminActivityRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/tickets/$id': typeof AuthenticatedTicketsIdRouteWithChildren
   '/tickets/new': typeof AuthenticatedTicketsNewRoute
@@ -105,6 +113,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/stats': typeof AuthenticatedStatsRoute
+  '/admin/activity': typeof AuthenticatedAdminActivityRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/tickets/$id': typeof AuthenticatedTicketsIdRouteWithChildren
   '/tickets/new': typeof AuthenticatedTicketsNewRoute
@@ -120,6 +129,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/stats': typeof AuthenticatedStatsRoute
+  '/_authenticated/admin/activity': typeof AuthenticatedAdminActivityRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/tickets/$id': typeof AuthenticatedTicketsIdRouteWithChildren
   '/_authenticated/tickets/new': typeof AuthenticatedTicketsNewRoute
@@ -135,6 +145,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/notifications'
     | '/stats'
+    | '/admin/activity'
     | '/admin/users'
     | '/tickets/$id'
     | '/tickets/new'
@@ -148,6 +159,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/notifications'
     | '/stats'
+    | '/admin/activity'
     | '/admin/users'
     | '/tickets/$id'
     | '/tickets/new'
@@ -162,6 +174,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/notifications'
     | '/_authenticated/stats'
+    | '/_authenticated/admin/activity'
     | '/_authenticated/admin/users'
     | '/_authenticated/tickets/$id'
     | '/_authenticated/tickets/new'
@@ -255,6 +268,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/activity': {
+      id: '/_authenticated/admin/activity'
+      path: '/admin/activity'
+      fullPath: '/admin/activity'
+      preLoaderRoute: typeof AuthenticatedAdminActivityRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/tickets/$id/rate': {
       id: '/_authenticated/tickets/$id/rate'
       path: '/rate'
@@ -283,6 +303,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedStatsRoute: typeof AuthenticatedStatsRoute
+  AuthenticatedAdminActivityRoute: typeof AuthenticatedAdminActivityRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedTicketsIdRoute: typeof AuthenticatedTicketsIdRouteWithChildren
   AuthenticatedTicketsNewRoute: typeof AuthenticatedTicketsNewRoute
@@ -293,6 +314,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedStatsRoute: AuthenticatedStatsRoute,
+  AuthenticatedAdminActivityRoute: AuthenticatedAdminActivityRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedTicketsIdRoute: AuthenticatedTicketsIdRouteWithChildren,
   AuthenticatedTicketsNewRoute: AuthenticatedTicketsNewRoute,
