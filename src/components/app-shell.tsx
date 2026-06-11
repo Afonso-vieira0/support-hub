@@ -14,6 +14,7 @@ import {
   Trophy,
   GitCompare,
   UserCog,
+  Trash2,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -57,6 +58,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/admin/ranking", label: "Ranking", icon: Trophy, show: isAdmin },
     { to: "/stats", label: "Estatísticas", icon: BarChart3, show: isAdmin },
     { to: "/admin/users", label: "Utilizadores", icon: Users, show: isAdmin },
+    { to: "/admin/trash", label: "Lixo", icon: Trash2, show: isAdmin },
     { to: "/notifications", label: "Notificações", icon: Bell, show: true },
   ];
 
