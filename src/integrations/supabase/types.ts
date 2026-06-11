@@ -383,6 +383,9 @@ export type Database = {
           category: Database["public"]["Enums"]["ticket_category"]
           client_id: string
           created_at: string
+          delete_reason: string | null
+          deleted_at: string | null
+          deleted_by: string | null
           description: string
           device_name: string
           id: string
@@ -398,6 +401,9 @@ export type Database = {
           category: Database["public"]["Enums"]["ticket_category"]
           client_id: string
           created_at?: string
+          delete_reason?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           description: string
           device_name: string
           id?: string
@@ -413,6 +419,9 @@ export type Database = {
           category?: Database["public"]["Enums"]["ticket_category"]
           client_id?: string
           created_at?: string
+          delete_reason?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           description?: string
           device_name?: string
           id?: string
@@ -474,6 +483,8 @@ export type Database = {
         | "ticket_closed"
         | "rating_received"
         | "user_login"
+        | "ticket_deleted"
+        | "ticket_restored"
       app_role: "super_admin" | "admin" | "technician" | "client"
       ticket_category:
         | "hardware"
@@ -630,6 +641,8 @@ export const Constants = {
         "ticket_closed",
         "rating_received",
         "user_login",
+        "ticket_deleted",
+        "ticket_restored",
       ],
       app_role: ["super_admin", "admin", "technician", "client"],
       ticket_category: [
