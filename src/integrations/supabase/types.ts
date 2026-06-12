@@ -106,6 +106,105 @@ export type Database = {
           },
         ]
       }
+      inventory_movements: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          delta: number
+          id: string
+          notes: string | null
+          part_id: string
+          reason: Database["public"]["Enums"]["inventory_movement_reason"]
+          ticket_id: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          delta: number
+          id?: string
+          notes?: string | null
+          part_id: string
+          reason: Database["public"]["Enums"]["inventory_movement_reason"]
+          ticket_id?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          delta?: number
+          id?: string
+          notes?: string | null
+          part_id?: string
+          reason?: Database["public"]["Enums"]["inventory_movement_reason"]
+          ticket_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_movements_part_id_fkey"
+            columns: ["part_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_parts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_movements_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inventory_parts: {
+        Row: {
+          archived_at: string | null
+          category: Database["public"]["Enums"]["part_category"]
+          created_at: string
+          id: string
+          location: string | null
+          low_stock_notified_at: string | null
+          min_quantity: number
+          name: string
+          notes: string | null
+          quantity: number
+          sku: string
+          unit: string
+          unit_cost: number
+          updated_at: string
+        }
+        Insert: {
+          archived_at?: string | null
+          category?: Database["public"]["Enums"]["part_category"]
+          created_at?: string
+          id?: string
+          location?: string | null
+          low_stock_notified_at?: string | null
+          min_quantity?: number
+          name: string
+          notes?: string | null
+          quantity?: number
+          sku: string
+          unit?: string
+          unit_cost?: number
+          updated_at?: string
+        }
+        Update: {
+          archived_at?: string | null
+          category?: Database["public"]["Enums"]["part_category"]
+          created_at?: string
+          id?: string
+          location?: string | null
+          low_stock_notified_at?: string | null
+          min_quantity?: number
+          name?: string
+          notes?: string | null
+          quantity?: number
+          sku?: string
+          unit?: string
+          unit_cost?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       login_events: {
         Row: {
           created_at: string
@@ -339,6 +438,48 @@ export type Database = {
           },
         ]
       }
+      ticket_parts_used: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          id: string
+          part_id: string
+          quantity: number
+          ticket_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          part_id: string
+          quantity: number
+          ticket_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          part_id?: string
+          quantity?: number
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_parts_used_part_id_fkey"
+            columns: ["part_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_parts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ticket_parts_used_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ticket_ratings: {
         Row: {
           client_id: string
@@ -467,6 +608,14 @@ export type Database = {
         }
         Returns: boolean
       }
+      inventory_top_consumed: {
+        Args: { _days?: number; _limit?: number }
+        Returns: {
+          name: string
+          part_id: string
+          total_used: number
+        }[]
+      }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_technician: { Args: { _user_id: string }; Returns: boolean }
     }
@@ -486,6 +635,25 @@ export type Database = {
         | "ticket_deleted"
         | "ticket_restored"
       app_role: "super_admin" | "admin" | "technician" | "client"
+      inventory_movement_reason:
+        | "purchase"
+        | "adjustment"
+        | "ticket_use"
+        | "return"
+        | "initial"
+      part_category:
+        | "ram"
+        | "ssd"
+        | "hdd"
+        | "psu"
+        | "screen"
+        | "battery"
+        | "cable"
+        | "motherboard"
+        | "cpu"
+        | "gpu"
+        | "keyboard"
+        | "other"
       ticket_category:
         | "hardware"
         | "software"
@@ -645,6 +813,27 @@ export const Constants = {
         "ticket_restored",
       ],
       app_role: ["super_admin", "admin", "technician", "client"],
+      inventory_movement_reason: [
+        "purchase",
+        "adjustment",
+        "ticket_use",
+        "return",
+        "initial",
+      ],
+      part_category: [
+        "ram",
+        "ssd",
+        "hdd",
+        "psu",
+        "screen",
+        "battery",
+        "cable",
+        "motherboard",
+        "cpu",
+        "gpu",
+        "keyboard",
+        "other",
+      ],
       ticket_category: [
         "hardware",
         "software",
