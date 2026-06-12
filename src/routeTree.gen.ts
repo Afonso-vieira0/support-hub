@@ -26,9 +26,11 @@ import { Route as AuthenticatedAdminExecutiveRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminCompareRouteImport } from './routes/_authenticated/admin.compare'
 import { Route as AuthenticatedAdminActivityRouteImport } from './routes/_authenticated/admin.activity'
 import { Route as AuthenticatedAdminTechniciansIndexRouteImport } from './routes/_authenticated/admin.technicians.index'
+import { Route as AuthenticatedAdminInventoryIndexRouteImport } from './routes/_authenticated/admin.inventory.index'
 import { Route as AuthenticatedTicketsIdRateRouteImport } from './routes/_authenticated/tickets.$id.rate'
 import { Route as AuthenticatedAdminTicketsIdRouteImport } from './routes/_authenticated/admin.tickets.$id'
 import { Route as AuthenticatedAdminTechniciansIdRouteImport } from './routes/_authenticated/admin.technicians.$id'
+import { Route as AuthenticatedAdminInventoryIdRouteImport } from './routes/_authenticated/admin.inventory.$id'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -121,6 +123,12 @@ const AuthenticatedAdminTechniciansIndexRoute =
     path: '/admin/technicians/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminInventoryIndexRoute =
+  AuthenticatedAdminInventoryIndexRouteImport.update({
+    id: '/admin/inventory/',
+    path: '/admin/inventory/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedTicketsIdRateRoute =
   AuthenticatedTicketsIdRateRouteImport.update({
     id: '/rate',
@@ -137,6 +145,12 @@ const AuthenticatedAdminTechniciansIdRoute =
   AuthenticatedAdminTechniciansIdRouteImport.update({
     id: '/admin/technicians/$id',
     path: '/admin/technicians/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminInventoryIdRoute =
+  AuthenticatedAdminInventoryIdRouteImport.update({
+    id: '/admin/inventory/$id',
+    path: '/admin/inventory/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 
@@ -156,9 +170,11 @@ export interface FileRoutesByFullPath {
   '/tickets/$id': typeof AuthenticatedTicketsIdRouteWithChildren
   '/tickets/new': typeof AuthenticatedTicketsNewRoute
   '/tickets/': typeof AuthenticatedTicketsIndexRoute
+  '/admin/inventory/$id': typeof AuthenticatedAdminInventoryIdRoute
   '/admin/technicians/$id': typeof AuthenticatedAdminTechniciansIdRoute
   '/admin/tickets/$id': typeof AuthenticatedAdminTicketsIdRoute
   '/tickets/$id/rate': typeof AuthenticatedTicketsIdRateRoute
+  '/admin/inventory/': typeof AuthenticatedAdminInventoryIndexRoute
   '/admin/technicians/': typeof AuthenticatedAdminTechniciansIndexRoute
 }
 export interface FileRoutesByTo {
@@ -177,9 +193,11 @@ export interface FileRoutesByTo {
   '/tickets/$id': typeof AuthenticatedTicketsIdRouteWithChildren
   '/tickets/new': typeof AuthenticatedTicketsNewRoute
   '/tickets': typeof AuthenticatedTicketsIndexRoute
+  '/admin/inventory/$id': typeof AuthenticatedAdminInventoryIdRoute
   '/admin/technicians/$id': typeof AuthenticatedAdminTechniciansIdRoute
   '/admin/tickets/$id': typeof AuthenticatedAdminTicketsIdRoute
   '/tickets/$id/rate': typeof AuthenticatedTicketsIdRateRoute
+  '/admin/inventory': typeof AuthenticatedAdminInventoryIndexRoute
   '/admin/technicians': typeof AuthenticatedAdminTechniciansIndexRoute
 }
 export interface FileRoutesById {
@@ -200,9 +218,11 @@ export interface FileRoutesById {
   '/_authenticated/tickets/$id': typeof AuthenticatedTicketsIdRouteWithChildren
   '/_authenticated/tickets/new': typeof AuthenticatedTicketsNewRoute
   '/_authenticated/tickets/': typeof AuthenticatedTicketsIndexRoute
+  '/_authenticated/admin/inventory/$id': typeof AuthenticatedAdminInventoryIdRoute
   '/_authenticated/admin/technicians/$id': typeof AuthenticatedAdminTechniciansIdRoute
   '/_authenticated/admin/tickets/$id': typeof AuthenticatedAdminTicketsIdRoute
   '/_authenticated/tickets/$id/rate': typeof AuthenticatedTicketsIdRateRoute
+  '/_authenticated/admin/inventory/': typeof AuthenticatedAdminInventoryIndexRoute
   '/_authenticated/admin/technicians/': typeof AuthenticatedAdminTechniciansIndexRoute
 }
 export interface FileRouteTypes {
@@ -223,9 +243,11 @@ export interface FileRouteTypes {
     | '/tickets/$id'
     | '/tickets/new'
     | '/tickets/'
+    | '/admin/inventory/$id'
     | '/admin/technicians/$id'
     | '/admin/tickets/$id'
     | '/tickets/$id/rate'
+    | '/admin/inventory/'
     | '/admin/technicians/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -244,9 +266,11 @@ export interface FileRouteTypes {
     | '/tickets/$id'
     | '/tickets/new'
     | '/tickets'
+    | '/admin/inventory/$id'
     | '/admin/technicians/$id'
     | '/admin/tickets/$id'
     | '/tickets/$id/rate'
+    | '/admin/inventory'
     | '/admin/technicians'
   id:
     | '__root__'
@@ -266,9 +290,11 @@ export interface FileRouteTypes {
     | '/_authenticated/tickets/$id'
     | '/_authenticated/tickets/new'
     | '/_authenticated/tickets/'
+    | '/_authenticated/admin/inventory/$id'
     | '/_authenticated/admin/technicians/$id'
     | '/_authenticated/admin/tickets/$id'
     | '/_authenticated/tickets/$id/rate'
+    | '/_authenticated/admin/inventory/'
     | '/_authenticated/admin/technicians/'
   fileRoutesById: FileRoutesById
 }
@@ -400,6 +426,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminTechniciansIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/inventory/': {
+      id: '/_authenticated/admin/inventory/'
+      path: '/admin/inventory'
+      fullPath: '/admin/inventory/'
+      preLoaderRoute: typeof AuthenticatedAdminInventoryIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/tickets/$id/rate': {
       id: '/_authenticated/tickets/$id/rate'
       path: '/rate'
@@ -419,6 +452,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/technicians/$id'
       fullPath: '/admin/technicians/$id'
       preLoaderRoute: typeof AuthenticatedAdminTechniciansIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/inventory/$id': {
+      id: '/_authenticated/admin/inventory/$id'
+      path: '/admin/inventory/$id'
+      fullPath: '/admin/inventory/$id'
+      preLoaderRoute: typeof AuthenticatedAdminInventoryIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
   }
@@ -451,8 +491,10 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTicketsIdRoute: typeof AuthenticatedTicketsIdRouteWithChildren
   AuthenticatedTicketsNewRoute: typeof AuthenticatedTicketsNewRoute
   AuthenticatedTicketsIndexRoute: typeof AuthenticatedTicketsIndexRoute
+  AuthenticatedAdminInventoryIdRoute: typeof AuthenticatedAdminInventoryIdRoute
   AuthenticatedAdminTechniciansIdRoute: typeof AuthenticatedAdminTechniciansIdRoute
   AuthenticatedAdminTicketsIdRoute: typeof AuthenticatedAdminTicketsIdRoute
+  AuthenticatedAdminInventoryIndexRoute: typeof AuthenticatedAdminInventoryIndexRoute
   AuthenticatedAdminTechniciansIndexRoute: typeof AuthenticatedAdminTechniciansIndexRoute
 }
 
@@ -469,8 +511,10 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTicketsIdRoute: AuthenticatedTicketsIdRouteWithChildren,
   AuthenticatedTicketsNewRoute: AuthenticatedTicketsNewRoute,
   AuthenticatedTicketsIndexRoute: AuthenticatedTicketsIndexRoute,
+  AuthenticatedAdminInventoryIdRoute: AuthenticatedAdminInventoryIdRoute,
   AuthenticatedAdminTechniciansIdRoute: AuthenticatedAdminTechniciansIdRoute,
   AuthenticatedAdminTicketsIdRoute: AuthenticatedAdminTicketsIdRoute,
+  AuthenticatedAdminInventoryIndexRoute: AuthenticatedAdminInventoryIndexRoute,
   AuthenticatedAdminTechniciansIndexRoute:
     AuthenticatedAdminTechniciansIndexRoute,
 }
@@ -487,3 +531,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
