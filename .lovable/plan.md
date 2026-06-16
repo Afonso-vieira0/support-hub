@@ -1,45 +1,53 @@
-## Plano — Apagar tickets (lixo recuperável)
+## Plano — Inventário de peças + Excel automático
 
 ### Base de dados (migração)
-- Adicionar à tabela `tickets`:
-  - `deleted_at TIMESTAMPTZ NULL`
-  - `deleted_by UUID NULL` (referência ao utilizador)
-  - `delete_reason TEXT NULL`
-- Índice parcial em `tickets(deleted_at)` para listagem rápida do lixo.
-- Atualizar políticas RLS de `tickets`:
-  - `SELECT` normal: clientes/técnicos só veem tickets onde `deleted_at IS NULL`.
-  - Admins veem tudo (incluindo apagados).
-  - `UPDATE` para soft-delete: permitido a **admins** e ao **técnico atribuído**.
-  - Restaurar/apagar definitivo: apenas admins.
-- Novo evento em `activity_events`: `ticket_deleted` e `ticket_restored` (via trigger em `on_ticket_update_events` quando `deleted_at` muda).
-- Mensagens, anexos e métricas ficam intactos (recuperáveis ao restaurar).
+- `inventory_parts`: `name`, `sku` (único), `category` (RAM, SSD, fonte, ecrã, bateria, cabo, outros), `unit` (un, m, kit), `quantity` (int), `min_quantity` (int), `unit_cost` (numeric), `location` (texto curto), `notes`.
+- `inventory_movements`: `part_id`, `ticket_id` (nullable), `actor_id`, `delta` (int — positivo = entrada, negativo = consumo), `reason` (`purchase`, `adjustment`, `ticket_use`, `return`), `created_at`.
+- `ticket_parts_used`: `ticket_id`, `part_id`, `quantity`, `created_at` — registo limpo do que cada ticket consumiu (vinculado a `inventory_movements`).
+- Trigger `apply_ticket_part_use`: ao inserir em `ticket_parts_used` cria movimento negativo e decrementa `inventory_parts.quantity`; se ficar `< min_quantity` cria `notifications` para todos os admins ("Stock baixo: <peça>").
+- Trigger `apply_inventory_movement` para movimentos manuais (entradas/ajustes) atualizar `quantity` de forma consistente.
+- RLS:
+  - `inventory_parts`: leitura por admin + técnico; escrita só admin.
+  - `inventory_movements`: leitura admin + técnico (próprios); insert admin (qualquer) e técnico (só `reason='ticket_use'`).
+  - `ticket_parts_used`: insert pelo técnico atribuído ao ticket ou admin; leitura por quem já vê o ticket.
+- GRANTs standard a `authenticated` e `service_role`.
 
-### Server functions (`src/lib/tickets.functions.ts`)
-- `softDeleteTickets({ ids, reason? })` — admin ou técnico atribuído; marca `deleted_at = now()`, `deleted_by = uid`.
-- `restoreTickets({ ids })` — só admin; limpa `deleted_at`.
-- `hardDeleteTickets({ ids })` — só admin; apaga definitivamente (cascade já existente em mensagens/anexos/métricas).
-- `getTrashTickets()` — só admin; lista paginada de tickets com `deleted_at NOT NULL`.
+### Server functions (`src/lib/inventory.functions.ts`)
+- `listParts({ search?, lowStockOnly? })` — admin/técnico.
+- `upsertPart(input)` / `deletePart({ id })` — admin.
+- `adjustStock({ partId, delta, reason, notes? })` — admin.
+- `usePartsOnTicket({ ticketId, items: [{partId, quantity}] })` — admin ou técnico atribuído; valida stock > 0 e cria registos.
+- `getTicketParts({ ticketId })`.
+- `getInventoryStats()` — totais, valor de stock (Σ qty×unit_cost), nº abaixo do mínimo, top peças consumidas (30d).
+- `exportInventoryXlsx()` — gera ficheiro `.xlsx` com 3 folhas (Peças, Movimentos, Consumos por ticket) usando `exceljs`; devolve base64 para download.
 
 ### Frontend
-- **`tickets.index.tsx`** (lista):
-  - Coluna de checkboxes para seleção múltipla.
-  - Barra de ações fixa no topo quando há seleção: "Apagar selecionados" com `AlertDialog` de confirmação e campo opcional de motivo.
-  - Apenas mostra checkboxes a quem pode apagar (admin ou técnico nos seus tickets).
-- **`tickets.$id.tsx`** (detalhe):
-  - Botão "Apagar ticket" (ícone lixo) no header, com `AlertDialog`.
-  - Após apagar → redireciona para `/tickets` + toast.
-- **`admin.trash.tsx`** (nova rota, só admin):
-  - Tabela com tickets apagados: número, dispositivo, quem apagou, quando, motivo.
-  - Ações por linha: **Restaurar** | **Apagar definitivamente** (com dupla confirmação).
-  - Seleção múltipla para restaurar/apagar em massa.
-- **Sidebar (`app-shell.tsx`)**: adicionar "Lixo" no grupo Admin com ícone `Trash2`.
+- **`admin.inventory.index.tsx`** (admin + técnico, escrita só admin):
+  - Tabela com pesquisa, filtro por categoria e toggle "Apenas stock baixo".
+  - Badges de stock (verde / amarelo ≤ 1.5× mínimo / vermelho ≤ mínimo).
+  - Botões admin: "Nova peça", "Ajustar stock" (entrada/saída com motivo), "Exportar Excel".
+- **`admin.inventory.$id.tsx`**: detalhe da peça com histórico de movimentos e tickets onde foi usada.
+- **`tickets.$id.tsx`** (área do técnico):
+  - Novo bloco "Peças utilizadas" visível ao técnico atribuído e admin.
+  - Adicionar peça: combobox de peças + quantidade; lista das já adicionadas; remove (reverte movimento) antes de fechar o ticket.
+  - Ao marcar resolvido, modal recorda confirmar peças usadas.
+- **Sidebar**: novo item "Inventário" (ícone `Package`) para admin + técnico; "Exportar Excel" como ação dentro da página.
+- **Dashboard executivo / Centro de Atividades**: cartões "Valor de stock", "Peças abaixo do mínimo", "Top 5 peças consumidas (30d)".
 
-### UX e segurança
-- Confirmações sempre via `AlertDialog` do shadcn (não `confirm()` nativo).
-- Toasts de sucesso/erro com `sonner`.
-- Técnico só pode soft-delete tickets onde `technician_id = auth.uid()`.
-- Listas existentes (executive dashboard, ranking, atividade) filtram `deleted_at IS NULL` por defeito, exceto vista admin do lixo.
+### Excel "automático"
+- Não há integração nativa com ficheiros .xlsx no disco do utilizador — Excel só atualiza se um ficheiro for aberto. A solução é gerar sempre um `.xlsx` atualizado a partir dos dados:
+  - **Botão "Exportar Excel"** no Inventário e na página da peça: chama `exportInventoryXlsx` e descarrega `inventario-AAAA-MM-DD-HHMM.xlsx`.
+  - **Endpoint público estável** `/api/public/inventory.xlsx?token=…`: protegido por token guardado em `inventory_export_tokens` (admin gera/revoga); permite ligar no Excel via *Dados → Obter dados da Web* e atualizar com um clique (recomendado em vez de ficheiro local).
+  - Folhas geradas: **Peças** (sku, nome, categoria, qty, min, unit_cost, valor_total, localização), **Movimentos** (data, peça, delta, motivo, técnico, ticket), **Consumos** (ticket, dispositivo, peça, qty, técnico, data).
+- Dependência nova: `exceljs` (`bun add exceljs`).
+
+### Detalhes técnicos
+- Validação Zod em todas as functions (qty ≥ 1, sku regex, etc.).
+- `usePartsOnTicket` usa `select … for update` lógico via RPC para evitar stock negativo em concorrência.
+- Notificação de stock baixo é deduplicada (1 por peça enquanto não voltar acima do mínimo) com flag `low_stock_notified_at` em `inventory_parts`.
+- Apagar peça com movimentos: soft-delete (`archived_at`) em vez de delete físico.
 
 ### Fora do âmbito
-- Auto-purga programada do lixo (pode ser adicionada depois com pg_cron).
-- Exportação dos tickets apagados.
+- Sincronização bidirecional com Google Sheets/OneDrive (requer conector). Pode ser acrescentada depois.
+- Códigos de barras / leitor.
+- Compras/encomendas a fornecedores.

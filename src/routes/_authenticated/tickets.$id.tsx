@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { softDeleteTickets } from "@/lib/tickets.functions";
+import { TicketPartsCard } from "@/components/ticket-parts-card";
 
 export const Route = createFileRoute("/_authenticated/tickets/$id")({
   component: TicketDetailPage,
@@ -318,6 +319,10 @@ function TicketDetailPage() {
               ))}
             </CardContent>
           </Card>
+
+          {(isAdmin || isTechnician) && (
+            <TicketPartsCard ticketId={id} canEdit={canManage} />
+          )}
         </div>
       </div>
     </div>
