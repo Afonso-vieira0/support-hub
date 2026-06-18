@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Pencil, Trash2, Monitor, Activity, Wrench } from "lucide-react";
+import { Plus, Pencil, Trash2, Monitor, Activity, Wrench, FileSpreadsheet } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/pcs")({
@@ -95,11 +95,78 @@ function PcsPage() {
     return <p className="text-sm text-muted-foreground">Acesso restrito.</p>;
   }
 
+  const exportXlsx = async () => {
+    try {
+      const ExcelJS = (await import("exceljs")).default;
+      const wb = new ExcelJS.Workbook();
+      wb.creator = "SupportHub";
+      wb.created = new Date();
+
+      const s1 = wb.addWorksheet("PCs");
+      s1.columns = [
+        { header: "ID_PC", key: "id", width: 14 },
+        { header: "Nome do Computador", key: "nome", width: 24 },
+        { header: "Marca/Modelo", key: "marca", width: 22 },
+        { header: "Processador", key: "processador", width: 22 },
+        { header: "RAM (GB)", key: "ram", width: 10 },
+        { header: "Armazenamento", key: "armazenamento", width: 18 },
+        { header: "Sistema Operacional", key: "so", width: 20 },
+        { header: "Utilizador Responsável", key: "usuario", width: 22 },
+        { header: "Departamento/Local", key: "departamento", width: 22 },
+        { header: "Data de Aquisição", key: "aquisicao", width: 14 },
+        { header: "Status", key: "status", width: 14 },
+        { header: "Número de Série", key: "serie", width: 18 },
+        { header: "Observações", key: "observacoes", width: 30 },
+      ];
+      s1.getRow(1).font = { bold: true };
+      pcs.forEach((p) => s1.addRow(p));
+      s1.autoFilter = { from: "A1", to: "M1" };
+
+      const s2 = wb.addWorksheet("Tickets");
+      s2.columns = [
+        { header: "Número", key: "numero", width: 12 },
+        { header: "Data", key: "data", width: 12 },
+        { header: "ID_PC", key: "pcId", width: 14 },
+        { header: "Nome do Computador", key: "nomeComputador", width: 24 },
+        { header: "Marca/Modelo", key: "marca", width: 22 },
+        { header: "Utilizador", key: "usuario", width: 22 },
+        { header: "Departamento", key: "departamento", width: 22 },
+        { header: "Descrição do Problema", key: "descricao", width: 36 },
+        { header: "Diagnóstico", key: "diagnostico", width: 30 },
+        { header: "Solução Aplicada", key: "solucao", width: 30 },
+        { header: "Status Final", key: "status", width: 16 },
+        { header: "Data de Conclusão", key: "conclusao", width: 16 },
+        { header: "Responsável Técnico", key: "responsavel", width: 22 },
+        { header: "Observações Finais", key: "observacoes", width: 30 },
+      ];
+      s2.getRow(1).font = { bold: true };
+      tickets.forEach((t) => s2.addRow(t));
+      s2.autoFilter = { from: "A1", to: "N1" };
+
+      const buf = await wb.xlsx.writeBuffer();
+      const blob = new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const stamp = new Date().toISOString().slice(0, 16).replace(/[:T]/g, "-");
+      a.href = url; a.download = `pcs-fichas-${stamp}.xlsx`;
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+      toast.success("Excel exportado");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Falha ao exportar");
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">PCs & Fichas de Manutenção</h1>
-        <p className="text-sm text-muted-foreground">Inventário de computadores e tickets de manutenção (guardado localmente).</p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">PCs & Fichas de Manutenção</h1>
+          <p className="text-sm text-muted-foreground">Inventário de computadores e tickets de manutenção (guardado localmente).</p>
+        </div>
+        <Button variant="outline" onClick={exportXlsx} disabled={!hydrated}>
+          <FileSpreadsheet className="mr-2 h-4 w-4" />Exportar Excel
+        </Button>
       </div>
       <Tabs defaultValue="inv" className="w-full">
         <TabsList>
