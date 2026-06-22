@@ -14,6 +14,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedStatsRouteImport } from './routes/_authenticated/stats'
+import { Route as AuthenticatedPcsRouteImport } from './routes/_authenticated/pcs'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedTicketsIndexRouteImport } from './routes/_authenticated/tickets.index'
@@ -54,6 +55,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthenticatedStatsRoute = AuthenticatedStatsRouteImport.update({
   id: '/stats',
   path: '/stats',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPcsRoute = AuthenticatedPcsRouteImport.update({
+  id: '/pcs',
+  path: '/pcs',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedNotificationsRoute =
@@ -160,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
+  '/pcs': typeof AuthenticatedPcsRoute
   '/stats': typeof AuthenticatedStatsRoute
   '/admin/activity': typeof AuthenticatedAdminActivityRoute
   '/admin/compare': typeof AuthenticatedAdminCompareRoute
@@ -183,6 +190,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
+  '/pcs': typeof AuthenticatedPcsRoute
   '/stats': typeof AuthenticatedStatsRoute
   '/admin/activity': typeof AuthenticatedAdminActivityRoute
   '/admin/compare': typeof AuthenticatedAdminCompareRoute
@@ -208,6 +216,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
+  '/_authenticated/pcs': typeof AuthenticatedPcsRoute
   '/_authenticated/stats': typeof AuthenticatedStatsRoute
   '/_authenticated/admin/activity': typeof AuthenticatedAdminActivityRoute
   '/_authenticated/admin/compare': typeof AuthenticatedAdminCompareRoute
@@ -233,6 +242,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/dashboard'
     | '/notifications'
+    | '/pcs'
     | '/stats'
     | '/admin/activity'
     | '/admin/compare'
@@ -256,6 +266,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/dashboard'
     | '/notifications'
+    | '/pcs'
     | '/stats'
     | '/admin/activity'
     | '/admin/compare'
@@ -280,6 +291,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/_authenticated/dashboard'
     | '/_authenticated/notifications'
+    | '/_authenticated/pcs'
     | '/_authenticated/stats'
     | '/_authenticated/admin/activity'
     | '/_authenticated/admin/compare'
@@ -340,6 +352,13 @@ declare module '@tanstack/react-router' {
       path: '/stats'
       fullPath: '/stats'
       preLoaderRoute: typeof AuthenticatedStatsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/pcs': {
+      id: '/_authenticated/pcs'
+      path: '/pcs'
+      fullPath: '/pcs'
+      preLoaderRoute: typeof AuthenticatedPcsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/notifications': {
@@ -481,6 +500,7 @@ const AuthenticatedTicketsIdRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
+  AuthenticatedPcsRoute: typeof AuthenticatedPcsRoute
   AuthenticatedStatsRoute: typeof AuthenticatedStatsRoute
   AuthenticatedAdminActivityRoute: typeof AuthenticatedAdminActivityRoute
   AuthenticatedAdminCompareRoute: typeof AuthenticatedAdminCompareRoute
@@ -501,6 +521,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
+  AuthenticatedPcsRoute: AuthenticatedPcsRoute,
   AuthenticatedStatsRoute: AuthenticatedStatsRoute,
   AuthenticatedAdminActivityRoute: AuthenticatedAdminActivityRoute,
   AuthenticatedAdminCompareRoute: AuthenticatedAdminCompareRoute,

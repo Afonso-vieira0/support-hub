@@ -16,6 +16,7 @@ import {
   UserCog,
   Trash2,
   Package,
+  Monitor,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -56,6 +57,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/tickets/new", label: "Novo ticket", icon: Plus, show: isClient || isAdmin },
     { to: "/admin/technicians", label: "Técnicos", icon: UserCog, show: isAdmin },
     { to: "/admin/inventory", label: "Inventário", icon: Package, show: isAdmin || isTechnician },
+    { to: "/pcs", label: "PCs & Fichas", icon: Monitor, show: isAdmin || isTechnician },
     { to: "/admin/compare", label: "Comparar", icon: GitCompare, show: isAdmin },
     { to: "/admin/ranking", label: "Ranking", icon: Trophy, show: isAdmin },
     { to: "/stats", label: "Estatísticas", icon: BarChart3, show: isAdmin },
