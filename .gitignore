@@ -34,3 +34,5 @@ dist-ssr
 # Build artifacts do microservico .NET
 microservico-relatorios/bin/
 microservico-relatorios/obj/
+.env
+.env.local

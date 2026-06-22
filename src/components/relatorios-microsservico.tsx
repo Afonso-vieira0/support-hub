@@ -7,9 +7,9 @@ interface RelatorioTickets {
   semTecnicoAtribuido: number;
   porStatus: Record<string, number>;
   porCategoria: Record<string, number>;
-  temposResolucao: { mediaHoras: number; ticketsComDados: number };
-  primeiraResposta: { mediaMinutos: number; ticketsComDados: number };
-  satisfacao: { mediaEstrelas: number; totalAvaliacoes: number; taxaResolvidosPct: number };
+  temposResolucao: { mediaHoras: number | null; ticketsComDados: number };
+  primeiraResposta: { mediaMinutos: number | null; ticketsComDados: number };
+  satisfacao: { mediaEstrelas: number | null; totalAvaliacoes: number; taxaResolvidosPct: number | null };
 }
 
 const MICROSERVICO_URL = "http://localhost:5000/relatorios/tickets";
@@ -49,6 +49,9 @@ export function RelatorioMicrosservico() {
     );
   }
 
+  const tempoMedio = data.temposResolucao.mediaHoras != null ? `${data.temposResolucao.mediaHoras.toFixed(1)}h` : "—";
+  const satisfacao = data.satisfacao.mediaEstrelas != null ? `${data.satisfacao.mediaEstrelas.toFixed(1)} ★` : "—";
+
   return (
     <Card>
       <CardHeader><CardTitle>Relatório (microsserviço .NET)</CardTitle></CardHeader>
@@ -56,8 +59,8 @@ export function RelatorioMicrosservico() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <MiniKpi label="Total de tickets" value={data.totalTickets} />
           <MiniKpi label="Sem técnico atribuído" value={data.semTecnicoAtribuido} />
-          <MiniKpi label="Tempo médio resolução (h)" value={data.temposResolucao.mediaHoras.toFixed(1)} />
-          <MiniKpi label="Satisfação média" value={`${data.satisfacao.mediaEstrelas.toFixed(1)} ★`} />
+          <MiniKpi label="Tempo médio resolução" value={tempoMedio} />
+          <MiniKpi label="Satisfação média" value={satisfacao} />
         </div>
         <p className="text-xs text-muted-foreground">
           Gerado pelo microsserviço em {new Date(data.geradoEm).toLocaleString("pt-PT")}
