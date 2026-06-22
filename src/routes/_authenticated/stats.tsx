@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CATEGORIES, categoryLabel } from "@/lib/categories";
 import { STATUSES, statusLabel } from "@/lib/statuses";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, CartesianGrid, Legend } from "recharts";
+import { RelatorioMicrosservico } from "@/components/relatorios-microsservico";
 
 export const Route = createFileRoute("/_authenticated/stats")({
   component: StatsPage,
@@ -57,6 +58,8 @@ function StatsPage() {
         <Kpi label="Tempo médio (h)" value={avgHours.toFixed(1)} />
         <Kpi label="Técnicos" value={new Set((data?.roles ?? []).filter((r: any) => r.role === "technician").map((r: any) => r.user_id)).size} />
       </div>
+
+      <RelatorioMicrosservico />
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>

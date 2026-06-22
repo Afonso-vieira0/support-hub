@@ -30,3 +30,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Variaveis de ambiente (nunca enviar para o GitHub)
+.env
+.env.local
+
+# Build artifacts do microservico .NET
+microservico-relatorios/bin/
+microservico-relatorios/obj/
