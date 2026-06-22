@@ -30,7 +30,7 @@ export function RelatorioMicrosservico() {
   if (isLoading) {
     return (
       <Card>
-        <CardHeader><CardTitle>Relatório (microsserviço .NET)</CardTitle></CardHeader>
+        <CardHeader><CardTitle>Relatórios</CardTitle></CardHeader>
         <CardContent><p className="text-sm text-muted-foreground">A carregar dados do microsserviço...</p></CardContent>
       </Card>
     );
@@ -39,7 +39,7 @@ export function RelatorioMicrosservico() {
   if (error || !data) {
     return (
       <Card>
-        <CardHeader><CardTitle>Relatório (microsserviço .NET)</CardTitle></CardHeader>
+        <CardHeader><CardTitle>Relatórios</CardTitle></CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">
             Não foi possível ligar ao microsserviço. Confirma que o container Docker está a correr em localhost:5000.
@@ -54,7 +54,7 @@ export function RelatorioMicrosservico() {
 
   return (
     <Card>
-      <CardHeader><CardTitle>Relatório (microsserviço .NET)</CardTitle></CardHeader>
+      <CardHeader><CardTitle>Relatórios</CardTitle></CardHeader>
       <CardContent className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <MiniKpi label="Total de tickets" value={data.totalTickets} />
