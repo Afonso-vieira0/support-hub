@@ -38,6 +38,7 @@ function TicketDetailPage() {
   const [sending, setSending] = useState(false);
   const [deleteReason, setDeleteReason] = useState("");
   const [deleting, setDeleting] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState(false);
   const softDelete = useServerFn(softDeleteTickets);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -136,6 +137,22 @@ function TicketDetailPage() {
     } catch (e: any) {
       toast.error(e?.message ?? "Erro ao apagar");
       setDeleting(false);
+    }
+  };
+
+  const sendReminderEmail = async () => {
+    if (!ticket) return;
+    setSendingEmail(true);
+    try {
+      const { error } = await supabase.functions.invoke("send-ticket-email", {
+        body: { ticketId: id, type: "reminder" },
+      });
+      if (error) throw error;
+      toast.success("Email de lembrete enviado");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Erro ao enviar email");
+    } finally {
+      setSendingEmail(false);
     }
   };
 
@@ -290,6 +307,7 @@ function TicketDetailPage() {
           </Card>
 
           {canManage && (
+            <>
             <Card>
               <CardHeader className="pb-3"><CardTitle className="text-sm">Alterar estado</CardTitle></CardHeader>
               <CardContent>
@@ -301,6 +319,15 @@ function TicketDetailPage() {
                 </Select>
               </CardContent>
             </Card>
+            <Card>
+              <CardHeader className="pb-3"><CardTitle className="text-sm">Notificações</CardTitle></CardHeader>
+              <CardContent>
+                <Button variant="outline" size="sm" className="w-full" onClick={sendReminderEmail} disabled={sendingEmail}>
+                  {sendingEmail ? "A enviar..." : "Enviar lembrete por email"}
+                </Button>
+              </CardContent>
+            </Card>
+            </>
           )}
 
           <Card>
