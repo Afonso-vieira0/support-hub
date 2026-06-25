@@ -56,59 +56,89 @@ Deno.serve(async (req) => {
       throw new Error("Ticket não encontrado.");
     }
 
-    let recipientId: string | null = null;
-    let subject = "";
-    let html = "";
+    const recipients: { email: string; subject: string; html: string }[] = [];
 
     if (type === "assigned") {
-      recipientId = ticket.technician_id;
-      subject = `Novo ticket atribuído: #${ticket.ticket_number}`;
-      html = `<p>Foi-lhe atribuído um novo ticket de suporte:</p>
-        <p><strong>#${ticket.ticket_number}</strong> — ${ticket.device_name} (${ticket.category})</p>
-        <p>Acesse o SupportHub para responder.</p>`;
+      if (ticket.technician_id) {
+        const { data: techProfile } = await supabase
+          .from("profiles")
+          .select("email")
+          .eq("id", ticket.technician_id)
+          .single();
+        if (techProfile?.email) {
+          recipients.push({
+            email: techProfile.email,
+            subject: `Novo ticket atribuído: #${ticket.ticket_number}`,
+            html: `<p>Foi-lhe atribuído um novo ticket de suporte:</p>
+              <p><strong>#${ticket.ticket_number}</strong> — ${ticket.device_name} (${ticket.category})</p>
+              <p>Acesse o SupportHub para responder.</p>`,
+          });
+        }
+      }
+
+      if (ticket.client_id) {
+        const { data: clientProfile } = await supabase
+          .from("profiles")
+          .select("email")
+          .eq("id", ticket.client_id)
+          .single();
+        if (clientProfile?.email) {
+          recipients.push({
+            email: clientProfile.email,
+            subject: `Um técnico foi atribuído ao seu ticket #${ticket.ticket_number}`,
+            html: `<p>Tem um técnico à espera para ajudar com o seu ticket:</p>
+              <p><strong>#${ticket.ticket_number}</strong> — ${ticket.device_name}</p>
+              <p>Acesse o SupportHub para acompanhar.</p>`,
+          });
+        }
+      }
     } else if (type === "reminder") {
-      recipientId = ticket.technician_id;
-      subject = `Lembrete: ticket #${ticket.ticket_number} à espera de resposta`;
-      html = `<p>O ticket <strong>#${ticket.ticket_number}</strong> (${ticket.device_name}) está à espera da sua resposta.</p>
-        <p>Acesse o SupportHub para responder.</p>`;
+      if (ticket.client_id) {
+        const { data: clientProfile } = await supabase
+          .from("profiles")
+          .select("email")
+          .eq("id", ticket.client_id)
+          .single();
+        if (clientProfile?.email) {
+          recipients.push({
+            email: clientProfile.email,
+            subject: `O técnico está à espera da sua resposta - ticket #${ticket.ticket_number}`,
+            html: `<p>O técnico está à espera da sua resposta no ticket:</p>
+              <p><strong>#${ticket.ticket_number}</strong> — ${ticket.device_name}</p>
+              <p>Acesse o SupportHub para responder.</p>`,
+          });
+        }
+      }
     } else {
       throw new Error("Tipo de notificação inválido.");
     }
 
-    if (!recipientId) {
-      throw new Error("Este ticket não tem técnico atribuído.");
+    if (recipients.length === 0) {
+      throw new Error("Nenhum destinatário válido encontrado para este ticket.");
     }
 
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("email, full_name")
-      .eq("id", recipientId)
-      .single();
+    for (const r of recipients) {
+      const resendResponse = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${resendApiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: "SupportHub <onboarding@resend.dev>",
+          to: [r.email],
+          subject: r.subject,
+          html: r.html,
+        }),
+      });
 
-    if (profileError || !profile?.email) {
-      throw new Error("Não foi possível encontrar o email do destinatário.");
+      if (!resendResponse.ok) {
+        const errText = await resendResponse.text();
+        throw new Error(`Erro ao enviar email: ${errText}`);
+      }
     }
 
-    const resendResponse = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${resendApiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: "SupportHub <onboarding@resend.dev>",
-        to: [profile.email],
-        subject,
-        html,
-      }),
-    });
-
-    if (!resendResponse.ok) {
-      const errText = await resendResponse.text();
-      throw new Error(`Erro ao enviar email: ${errText}`);
-    }
-
-    return new Response(JSON.stringify({ ok: true }), {
+    return new Response(JSON.stringify({ ok: true, sent: recipients.length }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {

@@ -14,7 +14,7 @@ export const Route = createFileRoute("/_authenticated/admin/executive")({
   component: ExecutivePage,
 });
 
-const PIE_COLORS = ["hsl(var(--primary))", "hsl(var(--info))", "hsl(var(--warning))", "hsl(var(--success))", "hsl(var(--accent))", "hsl(var(--secondary))", "hsl(var(--muted-foreground))"];
+const PIE_COLORS = ["#3b82f6", "#22c55e", "#f59e0b", "#ef4444", "#a855f7", "#06b6d4", "#64748b"];
 
 function ExecutivePage() {
   const { isAdmin } = useAuth();
@@ -88,8 +88,8 @@ function ExecutivePage() {
             <XAxis dataKey="month" fontSize={11} />
             <YAxis fontSize={11} />
             <Tooltip /><Legend />
-            <Bar dataKey="created" fill="hsl(var(--primary))" radius={4} />
-            <Bar dataKey="resolved" fill="hsl(var(--success))" radius={4} />
+            <Bar dataKey="created" fill="#3b82f6" radius={4} />
+            <Bar dataKey="resolved" fill="#22c55e" radius={4} />
           </BarChart>
         </ChartCard>
         <ChartCard title="Tickets por categoria">
